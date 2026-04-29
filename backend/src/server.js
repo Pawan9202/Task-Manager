@@ -45,7 +45,17 @@ app.get('/api/health', (req, res) => {
   res.json({ success: true, message: 'Team Task Manager API is running', timestamp: new Date().toISOString() });
 });
 
+// Ignore favicon requests
+app.get('/favicon.ico', (req, res) => res.status(204).end());
+
 const path = require('path');
+
+// Root redirect in production
+if (process.env.NODE_ENV === 'production') {
+  app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', '..', 'frontend', 'dist', 'index.html'));
+  });
+}
 
 // Routes
 app.use('/api/auth', authRoutes);
