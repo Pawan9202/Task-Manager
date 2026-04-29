@@ -1,5 +1,5 @@
 const User = require('../models/user.model');
-const AppError = require('../utils/AppError');
+const { AppError } = require('../middleware/errorHandler');
 const { successResponse, paginate } = require('../utils/apiResponse');
 
 const getUsers = async (req, res, next) => {

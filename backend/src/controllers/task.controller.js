@@ -1,7 +1,7 @@
 const Task = require('../models/task.model');
 const Project = require('../models/project.model');
 const User = require('../models/user.model');
-const AppError = require('../utils/AppError');
+const { AppError } = require('../middleware/errorHandler');
 const { successResponse, paginate } = require('../utils/apiResponse');
 const { logActivity } = require('../utils/activityLogger');
 
