@@ -1,3 +1,7 @@
+/**
+ * Project Detail — shows tasks, team members, and project stats
+ */
+
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { projectAPI, taskAPI, dashboardAPI, userAPI } from '../services/api';
@@ -21,7 +25,12 @@ const ProjectDetail = () => {
   const [taskForm, setTaskForm] = useState({ title: '', description: '', priority: 'medium', assignedTo: '', dueDate: '' });
 
   useEffect(() => {
-    Promise.all([projectAPI.getById(id), taskAPI.getAll({ project: id, limit: 50 }), dashboardAPI.getProjectStats(id), userAPI.getAll()])
+    Promise.all([
+      projectAPI.getById(id),
+      taskAPI.getAll({ project: id, limit: 50 }),
+      dashboardAPI.getProjectStats(id),
+      userAPI.getAll()
+    ])
       .then(([projectRes, tasksRes, statsRes, usersRes]) => {
         setProject(projectRes.data.data);
         setTasks(tasksRes.data.data.tasks);
@@ -100,10 +109,7 @@ const ProjectDetail = () => {
           </div>
         </div>
         {user.role === 'admin' && (
-          <button
-            onClick={() => setShowTaskModal(true)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-          >
+          <button onClick={() => setShowTaskModal(true)} className="flex items-center gap-2 px-4 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
             <Plus className="w-4 h-4" />
             New Task
           </button>
@@ -126,9 +132,7 @@ const ProjectDetail = () => {
           <div className="bg-white rounded-xl border border-gray-200 p-6">
             <h2 className="text-lg font-semibold mb-4">Tasks ({tasks.length})</h2>
             {tasks.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <p>No tasks yet. Create one to get started.</p>
-              </div>
+              <div className="text-center py-8 text-gray-500"><p>No tasks yet. Create one to get started.</p></div>
             ) : (
               <div className="space-y-3">
                 {tasks.map(task => (
@@ -173,6 +177,7 @@ const ProjectDetail = () => {
         </div>
       </div>
 
+      {/* Create task modal */}
       <Modal isOpen={showTaskModal} onClose={() => setShowTaskModal(false)} title="Create Task">
         <form onSubmit={handleCreateTask} className="space-y-4">
           <div>
@@ -209,6 +214,7 @@ const ProjectDetail = () => {
         </form>
       </Modal>
 
+      {/* Add member modal */}
       <Modal isOpen={showAddMemberModal} onClose={() => setShowAddMemberModal(false)} title="Add Member">
         <div className="space-y-2">
           {users.length === 0 ? <p className="text-gray-500 text-center py-4">No users available to add</p> : users.map(u => (

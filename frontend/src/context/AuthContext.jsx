@@ -1,3 +1,8 @@
+/**
+ * Auth Context — manages global authentication state
+ * Persists user/token in localStorage across sessions
+ */
+
 import { createContext, useContext, useState, useEffect } from 'react';
 import { authAPI } from '../services/api';
 
@@ -7,6 +12,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Restore session from localStorage on mount
   useEffect(() => {
     const token = localStorage.getItem('token');
     const storedUser = localStorage.getItem('user');

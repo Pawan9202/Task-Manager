@@ -1,3 +1,12 @@
+/**
+ * Task Controller
+ * 
+ * Admin: create, delete, reassign, update any task
+ * Members: view assigned tasks, update own task status
+ * 
+ * Status transitions validated via Task model state machine
+ */
+
 const Task = require('../models/task.model');
 const Project = require('../models/project.model');
 const User = require('../models/user.model');
@@ -11,30 +20,21 @@ const createTask = async (req, res, next) => {
 
     const projectDoc = await Project.findById(project);
     if (!projectDoc) return next(new AppError('Project not found', 404));
-
     if (!projectDoc.isUserMember(req.user._id) && req.user.role !== 'admin') {
       return next(new AppError('You do not have access to this project', 403));
     }
 
     const assignedUser = await User.findById(assignedTo);
     if (!assignedUser) return next(new AppError('Assigned user not found', 404));
-
     if (!projectDoc.members.includes(assignedTo) && projectDoc.createdBy.toString() !== assignedTo) {
       return next(new AppError('Assigned user must be a project member', 400));
     }
 
     const task = await Task.create({
-      title,
-      description,
-      priority,
-      project,
-      assignedTo,
-      createdBy: req.user._id,
-      dueDate
+      title, description, priority, project, assignedTo, createdBy: req.user._id, dueDate
     });
 
     await logActivity(req.user._id, 'create', 'task', task._id, `Task "${title}" created`);
-
     successResponse(res, 201, task, 'Task created successfully');
   } catch (error) {
     next(error);
@@ -65,9 +65,7 @@ const getTasks = async (req, res, next) => {
     if (status) query.status = status;
     if (priority) query.priority = priority;
     if (assignedTo) query.assignedTo = assignedTo;
-    if (req.user.role === 'member' && !assignedTo) {
-      query.assignedTo = req.user._id;
-    }
+    if (req.user.role === 'member' && !assignedTo) query.assignedTo = req.user._id;
     if (search) {
       query.$or = [
         { title: { $regex: search, $options: 'i' } },
@@ -88,12 +86,7 @@ const getTasks = async (req, res, next) => {
 
     successResponse(res, 200, {
       tasks,
-      pagination: {
-        total,
-        page: parseInt(page),
-        limit: parseInt(limit),
-        pages: Math.ceil(total / parsedLimit)
-      }
+      pagination: { total, page: parseInt(page), limit: parseInt(limit), pages: Math.ceil(total / parsedLimit) }
     });
   } catch (error) {
     next(error);
@@ -135,9 +128,7 @@ const updateTask = async (req, res, next) => {
     }
 
     if (req.body.assignedTo) {
-      if (req.user.role !== 'admin') {
-        return next(new AppError('Only admins can reassign tasks', 403));
-      }
+      if (req.user.role !== 'admin') return next(new AppError('Only admins can reassign tasks', 403));
       const user = await User.findById(req.body.assignedTo);
       if (!user) return next(new AppError('User not found', 404));
       if (!project.members.includes(req.body.assignedTo) && project.createdBy.toString() !== req.body.assignedTo) {
@@ -176,10 +167,7 @@ const updateTaskStatus = async (req, res, next) => {
 
     const { status } = req.body;
     if (!Task.isValidTransition(task.status, status)) {
-      return next(new AppError(
-        `Invalid status transition from "${task.status}" to "${status}". Valid transitions: ${Task.isValidTransition.__proto__}`,
-        400
-      ));
+      return next(new AppError(`Invalid status transition from "${task.status}" to "${status}"`, 400));
     }
 
     const oldStatus = task.status;
@@ -210,18 +198,10 @@ const deleteTask = async (req, res, next) => {
     await task.deleteOne();
 
     await logActivity(req.user._id, 'delete', 'task', task._id, `Task "${taskTitle}" deleted`);
-
     successResponse(res, 200, null, 'Task deleted successfully');
   } catch (error) {
     next(error);
   }
 };
 
-module.exports = {
-  createTask,
-  getTasks,
-  getTask,
-  updateTask,
-  updateTaskStatus,
-  deleteTask
-};
+module.exports = { createTask, getTasks, getTask, updateTask, updateTaskStatus, deleteTask };

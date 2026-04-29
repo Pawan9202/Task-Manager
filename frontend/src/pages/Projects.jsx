@@ -1,9 +1,13 @@
+/**
+ * Projects page — list all projects, create new ones (admin only)
+ */
+
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { projectAPI, userAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import Modal from '../components/Modal';
-import { FolderKanban, Plus, Users, Loader2, Trash2, Edit2, Calendar } from 'lucide-react';
+import { FolderKanban, Plus, Users, Loader2, Trash2, Calendar } from 'lucide-react';
 
 const Projects = () => {
   const { user } = useAuth();
@@ -68,10 +72,7 @@ const Projects = () => {
           <p className="text-gray-500 mt-1">Manage your team projects</p>
         </div>
         {user.role === 'admin' && (
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-          >
+          <button onClick={() => setShowCreateModal(true)} className="flex items-center gap-2 px-4 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
             <Plus className="w-4 h-4" />
             New Project
           </button>
@@ -95,10 +96,7 @@ const Projects = () => {
                   <FolderKanban className="w-5 h-5" style={{ color: project.color }} />
                 </div>
                 {user.role === 'admin' && (
-                  <button
-                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDelete(project._id); }}
-                    className="p-1.5 text-gray-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-all"
-                  >
+                  <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDelete(project._id); }} className="p-1.5 text-gray-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-all">
                     <Trash2 className="w-4 h-4" />
                   </button>
                 )}
@@ -120,40 +118,22 @@ const Projects = () => {
         </div>
       )}
 
+      {/* Create project modal */}
       <Modal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} title="Create Project">
         <form onSubmit={handleCreate} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Project Name</label>
-            <input
-              type="text"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
-              placeholder="My Project"
-              required
-            />
+            <input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none" placeholder="My Project" required />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Description</label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none resize-none"
-              rows={3}
-              placeholder="Project description..."
-            />
+            <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none resize-none" rows={3} placeholder="Project description..." />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Color</label>
             <div className="flex gap-2">
               {['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'].map(color => (
-                <button
-                  key={color}
-                  type="button"
-                  onClick={() => setFormData({ ...formData, color })}
-                  className={`w-8 h-8 rounded-full transition-transform ${formData.color === color ? 'ring-2 ring-offset-2 ring-gray-400 scale-110' : ''}`}
-                  style={{ backgroundColor: color }}
-                />
+                <button key={color} type="button" onClick={() => setFormData({ ...formData, color })} className={`w-8 h-8 rounded-full transition-transform ${formData.color === color ? 'ring-2 ring-offset-2 ring-gray-400 scale-110' : ''}`} style={{ backgroundColor: color }} />
               ))}
             </div>
           </div>
@@ -162,21 +142,14 @@ const Projects = () => {
             <div className="max-h-40 overflow-y-auto space-y-2 border border-gray-200 rounded-lg p-3">
               {users.map(u => (
                 <label key={u._id} className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={formData.members.includes(u._id)}
-                    onChange={() => toggleMember(u._id)}
-                    className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-                  />
+                  <input type="checkbox" checked={formData.members.includes(u._id)} onChange={() => toggleMember(u._id)} className="rounded border-gray-300 text-primary-600 focus:ring-primary-500" />
                   <span className="text-sm">{u.name}</span>
                   <span className="text-xs text-gray-400 capitalize">({u.role})</span>
                 </label>
               ))}
             </div>
           </div>
-          <button type="submit" className="w-full py-2.5 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors">
-            Create Project
-          </button>
+          <button type="submit" className="w-full py-2.5 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors">Create Project</button>
         </form>
       </Modal>
     </div>

@@ -1,3 +1,8 @@
+/**
+ * Tasks page — list all tasks with filters (status, priority, search)
+ * Members see only their assigned tasks; admins see all
+ */
+
 import { useState, useEffect } from 'react';
 import { taskAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -32,7 +37,7 @@ const Tasks = () => {
     }
   };
 
-  const statusColors = { '': 'All', 'todo': 'To Do', 'in-progress': 'In Progress', 'done': 'Done' };
+  const statusLabels = { '': 'All', 'todo': 'To Do', 'in-progress': 'In Progress', 'done': 'Done' };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -43,33 +48,18 @@ const Tasks = () => {
 
       {error && <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-lg">{error}</div>}
 
+      {/* Filters bar */}
       <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input
-              type="text"
-              value={filters.search}
-              onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-              placeholder="Search tasks..."
-              className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
-            />
+            <input type="text" value={filters.search} onChange={(e) => setFilters({ ...filters, search: e.target.value })} placeholder="Search tasks..." className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none" />
           </div>
           <div className="flex gap-3">
-            <select
-              value={filters.status}
-              onChange={(e) => setFilters({ ...filters, status: e.target.value, page: 1 })}
-              className="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
-            >
-              {Object.entries(statusColors).map(([value, label]) => (
-                <option key={value} value={value}>{label}</option>
-              ))}
+            <select value={filters.status} onChange={(e) => setFilters({ ...filters, status: e.target.value, page: 1 })} className="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none">
+              {Object.entries(statusLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
             </select>
-            <select
-              value={filters.priority}
-              onChange={(e) => setFilters({ ...filters, priority: e.target.value, page: 1 })}
-              className="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
-            >
+            <select value={filters.priority} onChange={(e) => setFilters({ ...filters, priority: e.target.value, page: 1 })} className="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none">
               <option value="">All Priorities</option>
               <option value="low">Low</option>
               <option value="medium">Medium</option>
@@ -98,21 +88,9 @@ const Tasks = () => {
 
           {pagination.pages > 1 && (
             <div className="flex items-center justify-center gap-2 mt-6">
-              <button
-                onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
-                disabled={pagination.page === 1}
-                className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-              >
-                Previous
-              </button>
+              <button onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))} disabled={pagination.page === 1} className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50">Previous</button>
               <span className="text-sm text-gray-600">Page {pagination.page} of {pagination.pages}</span>
-              <button
-                onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
-                disabled={pagination.page >= pagination.pages}
-                className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-              >
-                Next
-              </button>
+              <button onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))} disabled={pagination.page >= pagination.pages} className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50">Next</button>
             </div>
           )}
         </>

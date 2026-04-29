@@ -1,3 +1,10 @@
+/**
+ * Error Handler Middleware
+ * 
+ * Centralized error handling — catches all errors and returns
+ * consistent JSON responses. Handles MongoDB duplicate key and cast errors.
+ */
+
 class AppError extends Error {
   constructor(message, statusCode) {
     super(message);
@@ -22,7 +29,7 @@ const errorHandler = (err, req, res, next) => {
     err.statusCode = 400;
   }
 
-  // MongoDB cast error (invalid ObjectId)
+  // Invalid ObjectId format
   if (err.name === 'CastError') {
     err.message = `Invalid ${err.path}: ${err.value}`;
     err.statusCode = 400;

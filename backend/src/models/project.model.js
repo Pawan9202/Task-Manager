@@ -1,3 +1,8 @@
+/**
+ * Project Model
+ * Projects contain tasks and team members. Created by admins only.
+ */
+
 const mongoose = require('mongoose');
 
 const projectSchema = new mongoose.Schema({
@@ -37,9 +42,15 @@ const projectSchema = new mongoose.Schema({
 projectSchema.index({ createdBy: 1 });
 projectSchema.index({ members: 1 });
 
+/**
+ * Check if user is a member or creator of this project
+ * Handles both ObjectId refs and populated documents
+ */
 projectSchema.methods.isUserMember = function(userId) {
-  return this.members.some(memberId => memberId.toString() === userId.toString()) ||
-         this.createdBy.toString() === userId.toString();
+  const uid = userId.toString();
+  const isCreator = this.createdBy.toString() === uid;
+  const isMember = this.members.some(m => m.toString() === uid);
+  return isCreator || isMember;
 };
 
 module.exports = mongoose.model('Project', projectSchema);

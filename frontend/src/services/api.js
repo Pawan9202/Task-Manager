@@ -1,3 +1,8 @@
+/**
+ * Axios API client with JWT interceptor
+ * Auto-attaches token to requests and handles 401 redirects
+ */
+
 import axios from 'axios';
 
 const api = axios.create({
@@ -7,9 +12,7 @@ const api = axios.create({
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+  if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 

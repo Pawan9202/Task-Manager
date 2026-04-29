@@ -1,3 +1,10 @@
+/**
+ * Auth Controller — signup, login, profile
+ * 
+ * First user to sign up is auto-assigned admin role.
+ * Password hashing handled by User model pre-save hook.
+ */
+
 const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
 const { AppError } = require('../middleware/errorHandler');
@@ -5,9 +12,7 @@ const { successResponse } = require('../utils/apiResponse');
 const { logActivity } = require('../utils/activityLogger');
 
 const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN
-  });
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
 };
 
 const signup = async (req, res, next) => {
@@ -19,6 +24,7 @@ const signup = async (req, res, next) => {
       return next(new AppError('Email already registered', 400));
     }
 
+    // First user becomes admin automatically
     const isFirstUser = (await User.countDocuments()) === 0;
     const userRole = isFirstUser ? 'admin' : role;
 
@@ -51,7 +57,6 @@ const login = async (req, res, next) => {
     }
 
     const token = generateToken(user._id);
-
     await logActivity(user._id, 'login', 'user', user._id, `User ${user.name} logged in`);
 
     successResponse(res, 200, {

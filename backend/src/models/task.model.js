@@ -1,3 +1,10 @@
+/**
+ * Task Model
+ * 
+ * Enforces strict status transitions to maintain workflow integrity:
+ * todo → in-progress → done (with allowed reversals)
+ */
+
 const mongoose = require('mongoose');
 
 const VALID_STATUSES = ['todo', 'in-progress', 'done'];
@@ -61,10 +68,12 @@ taskSchema.index({ assignedTo: 1 });
 taskSchema.index({ status: 1 });
 taskSchema.index({ dueDate: 1 });
 
+// Static method — validates allowed status transitions
 taskSchema.statics.isValidTransition = function(from, to) {
   return VALID_TRANSITIONS[from] && VALID_TRANSITIONS[from].includes(to);
 };
 
+// Auto-detect overdue status based on due date
 taskSchema.methods.checkOverdue = function() {
   if (this.dueDate && this.status !== 'done') {
     this.isOverdue = new Date() > new Date(this.dueDate);
@@ -74,6 +83,7 @@ taskSchema.methods.checkOverdue = function() {
   return this.isOverdue;
 };
 
+// Check overdue before every save
 taskSchema.pre('save', function(next) {
   this.checkOverdue();
   next();

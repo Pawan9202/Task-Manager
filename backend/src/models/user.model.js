@@ -1,3 +1,10 @@
+/**
+ * User Model
+ * 
+ * Roles: 'admin' (full access) or 'member' (restricted)
+ * First user to sign up is auto-promoted to admin.
+ */
+
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
@@ -20,7 +27,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Password is required'],
     minlength: [6, 'Password must be at least 6 characters'],
-    select: false
+    select: false // exclude from queries by default
   },
   role: {
     type: String,
@@ -35,6 +42,7 @@ const userSchema = new mongoose.Schema({
   timestamps: true
 });
 
+// Auto-hash password before saving
 userSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();
   this.password = await bcrypt.hash(this.password, 12);
@@ -45,6 +53,7 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
+// Exclude password from JSON responses
 userSchema.methods.toJSON = function() {
   const user = this.toObject();
   delete user.password;

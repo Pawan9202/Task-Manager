@@ -1,3 +1,10 @@
+/**
+ * Authentication Middleware
+ * 
+ * authenticate — verifies JWT and attaches user to request
+ * authorize    — checks if user role matches allowed roles
+ */
+
 const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
 const { AppError } = require('./errorHandler');
@@ -30,6 +37,7 @@ const authenticate = async (req, res, next) => {
   }
 };
 
+// Factory — creates role-checking middleware
 const authorize = (...roles) => {
   return (req, res, next) => {
     if (!req.user) {

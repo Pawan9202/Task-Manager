@@ -1,3 +1,7 @@
+/**
+ * Dashboard page — shows task statistics and recent activity
+ */
+
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { dashboardAPI } from '../services/api';
@@ -18,19 +22,11 @@ const Dashboard = () => {
   }, []);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
-      </div>
-    );
+    return <div className="flex items-center justify-center min-h-[60vh]"><Loader2 className="w-8 h-8 animate-spin text-primary-600" /></div>;
   }
 
   if (error) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="p-4 bg-red-50 text-red-700 rounded-lg">{error}</div>
-      </div>
-    );
+    return <div className="max-w-7xl mx-auto px-4 py-8"><div className="p-4 bg-red-50 text-red-700 rounded-lg">{error}</div></div>;
   }
 
   const { overview, projects, byPriority, recentTasks } = stats;
@@ -97,14 +93,11 @@ const Dashboard = () => {
                   <span className="capitalize text-gray-600">{priority}</span>
                   <div className="flex items-center gap-2">
                     <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full rounded-full ${
-                          priority === 'urgent' ? 'bg-red-500' :
-                          priority === 'high' ? 'bg-orange-500' :
-                          priority === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
-                        }`}
-                        style={{ width: `${overview.totalTasks ? ((byPriority[priority] || 0) / overview.totalTasks) * 100 : 0}%` }}
-                      />
+                      <div className={`h-full rounded-full ${
+                        priority === 'urgent' ? 'bg-red-500' :
+                        priority === 'high' ? 'bg-orange-500' :
+                        priority === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
+                      }`} style={{ width: `${overview.totalTasks ? ((byPriority[priority] || 0) / overview.totalTasks) * 100 : 0}%` }} />
                     </div>
                     <span className="text-sm font-medium w-8 text-right">{byPriority[priority] || 0}</span>
                   </div>

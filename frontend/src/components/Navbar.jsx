@@ -1,3 +1,8 @@
+/**
+ * Navbar — top navigation with responsive mobile menu
+ * Shows nav links and user info; hides when not authenticated
+ */
+
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -32,6 +37,7 @@ const Navbar = () => {
             </Link>
           </div>
 
+          {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-6">
             {navItems.map(({ label, path, icon: Icon }) => (
               <Link key={path} to={path} className="flex items-center gap-2 text-gray-600 hover:text-primary-600 transition-colors">
@@ -41,6 +47,7 @@ const Navbar = () => {
             ))}
           </div>
 
+          {/* User info + logout */}
           <div className="hidden md:flex items-center gap-4">
             <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-full">
               <User className="w-4 h-4 text-gray-500" />
@@ -53,6 +60,7 @@ const Navbar = () => {
             </button>
           </div>
 
+          {/* Mobile menu toggle */}
           <div className="md:hidden flex items-center">
             <button onClick={() => setIsOpen(!isOpen)} className="p-2">
               {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -61,6 +69,7 @@ const Navbar = () => {
         </div>
       </div>
 
+      {/* Mobile dropdown */}
       {isOpen && (
         <div className="md:hidden border-t border-gray-200 bg-white">
           <div className="px-4 py-3 space-y-2">
