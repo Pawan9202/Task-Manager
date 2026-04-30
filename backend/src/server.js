@@ -20,11 +20,13 @@ const PORT = process.env.PORT || 5000;
 // Security headers
 app.use(helmet());
 
-// CORS — allow frontend in dev, any origin in prod with credentials
-app.use(cors({
-  origin: process.env.NODE_ENV === 'production' ? true : (process.env.FRONTEND_URL || 'http://localhost:5173'),
-  credentials: true
-}));
+// CORS — only needed in development (Railway serves frontend/backend same-origin)
+if (process.env.NODE_ENV !== 'production') {
+  app.use(cors({
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    credentials: true
+  }));
+}
 
 // Rate limiting — 100 requests per 15 min per IP
 const limiter = rateLimit({
